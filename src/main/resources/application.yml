@@ -1,0 +1,11 @@
+oauth2:
+  client-id: client
+  secret: secret
+
+security:
+  oauth2:
+    resource:
+      #     配置resourceId,userinfo的url地址,不使用token-info
+      id: kg-authority
+      user-info-uri: http://:10002/user
+      prefer-token-info: false
