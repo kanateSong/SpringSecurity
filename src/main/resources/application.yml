@@ -5,7 +5,7 @@ oauth2:
 security:
   oauth2:
     resource:
-      #     配置resourceId,userinfo的url地址,不使用token-info
+      #资源服务器可以在这里配置resourceId,userinfo的url地址,不使用token-info
       id: kg-authority
       user-info-uri: http://:10002/user
       prefer-token-info: false
