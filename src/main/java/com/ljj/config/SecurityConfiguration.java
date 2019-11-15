@@ -20,7 +20,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
  **/
 @Configuration
 @EnableWebSecurity
-//@Order(1000) 可以设置优先级
+@Order(1000) //可以设置优先级
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     @Override
@@ -34,7 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    //配置在内存中的两个用户
+    //配置在内存中的两个用户，效果跟上面一样
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         //替换了AuthenticationManager效果
         auth.inMemoryAuthentication()
@@ -48,14 +48,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     }
 
-    //不定义没有password grant_type
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
-        //使用configure(AuthenticationManagerBuilder auth)则要获得注入AuthenticationManager
+        //不重写configure(AuthenticationManagerBuilder auth)注入内存中的用户会被新的管理覆盖
         return super.authenticationManagerBean();
     }
-
 
     //配置不需要权限验证的路径
     @Override
@@ -68,5 +66,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll();
         // @formatter:on
     }
-
 }

@@ -33,17 +33,17 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Autowired
     private UserDetailsService userService;
 
+    private static final String DEMO_RESOURCE_ID = "order";
+
     @Value("${oauth2.client-id}")
     private String clientId;
     @Value("${oauth2.secret}")
     private String clientSecret;
 
-    private static final String DEMO_RESOURCE_ID = "order";
-
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         //配置两个客户端,一个用于password认证一个用于client认证
-        /*clients.inMemory().withClient("client_1")
+        clients.inMemory().withClient("client_1")
                 .resourceIds(DEMO_RESOURCE_ID)//客户端ID
                 .authorizedGrantTypes("client_credentials", "refresh_token")
                 .scopes("select")
@@ -54,9 +54,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .authorizedGrantTypes("password", "refresh_token")
                 .scopes("select")
                 .authorities("client")
-                .secret("123456");*/
-
-        String finalSecret = "{bcrypt}"+passwordEncoder().encode(clientSecret);
+                .secret("123456");
+        //使用bcrypt加密
+        /*String finalSecret = "{bcrypt}"+passwordEncoder().encode(clientSecret);
         clients.inMemory()
                 .withClient(clientId)//客户端ID
                 .authorizedGrantTypes("password", "refresh_token","client_credentials")//设置验证方式
@@ -64,17 +64,20 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .secret(finalSecret)//设置客户端密码
                 .authorities("oauth2")
                 .accessTokenValiditySeconds(7200) //token过期时间
-                .refreshTokenValiditySeconds(7200); //refresh过期时间
+                .refreshTokenValiditySeconds(7200); //refresh过期时间*/
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        //使用redis的tokenStore token信息保存到redis
+        //token信息保存到redis
         endpoints.tokenStore(new RedisTokenStore(redisConnectionFactory))
-                .authenticationManager(authenticationManager)
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
-                //配置userService 这样每次认证的时候会去检验用户是否锁定，有效等
-                .userDetailsService(userService);
+                //这一步的配置是必不可少的，否则SpringBoot会自动配置一个AuthenticationManager,覆盖掉内存中的用户
+                .authenticationManager(authenticationManager);
+                // 不加报错"method_not_allowed"
+                //.allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
+                //一般会重写配置userService 这样每次认证的时候会去检验用户是否锁定，有效等.
+                // 没有它，在使用refresh_token的时候会报错，现在使用内存中新建的userservice
+                //.userDetailsService(userService);
     }
 
     @Bean
