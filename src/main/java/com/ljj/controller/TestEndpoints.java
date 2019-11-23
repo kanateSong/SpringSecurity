@@ -25,13 +25,10 @@ public class TestEndpoints {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return "order id : " + id;
     }
-
     @GetMapping("/product")
     @ApiOperation(value = "没有保护的接口", hidden = true)
     public String getProduct(@PathVariable String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return "product id : " + id;
     }
-
-
 }
